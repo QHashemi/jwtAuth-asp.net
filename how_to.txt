@@ -1,3 +1,5 @@
+Login and Register + JWT + Password Hash
+
 1. Create Folder name Entities (Database Model)
 2. Inside the Entities folder create file name User.cs (Add Entity )
 3. Inside the Entities folder create Folder name Models
@@ -46,3 +48,30 @@
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }
 
+
+Git hub push =======================================>
+
+Database configuration
+1. Create new folder name Data
+2. inside the data folder create file name DbContext.cs
+3. Install Package name Microsoft.EntityFrameworkCore with correct version
+4. install Package name Microsoft.EntityFrameworkCore.SqlServer with correct version
+5. Install Package name Microsoft.EntityFrameworkCore.Tools with correct version
+4. Add logic for DbContext.cs configurations
+5. register DbContext inside program.cs as following:
+    builder.Services.AddDbContext<DataContext>(options =>
+    {
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+    });
+6. Add Connection string inside appsettings.json as following:
+  "ConnectionStrings": {
+    "DefaultConnectionString": "Server="
+    }
+7. Open Sql Server Management Studio and create new database
+8. Open SQL Server configuration and copy the connection string and paste inside appsettings.json
+9. Open Package Manager Console and run following commands:
+   a. Add-Migration InitialCreate
+   b. Update-Database
+10. Run the update-database command to create the database tables based on your DbContext and entity configurations.
+
+Git hub push ======================================>

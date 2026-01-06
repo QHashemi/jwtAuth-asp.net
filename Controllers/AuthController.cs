@@ -25,12 +25,10 @@ namespace jwtAuth.Controllers
         public ActionResult<User> Register(UserDto request)
         {
             // hash password
-            var hashedPassowrd = new PasswordHasher<User>()
-                .HashPassword(user, request.Password);
+            var hashedPassowrd = new PasswordHasher<User>().HashPassword(user, request.Password);
 
             user.Username = request.Username;
             user.PasswordHash = hashedPassowrd;
-
 
             return Ok(user);
         }
@@ -48,16 +46,15 @@ namespace jwtAuth.Controllers
             }
 
             // verify password
-            var result = new PasswordHasher<User>()
-                .VerifyHashedPassword(user, user.PasswordHash, request.Password) == PasswordVerificationResult.Failed;
+            var result = new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, request.Password) == PasswordVerificationResult.Failed;
             if (result)
             {
                 return BadRequest("Wrong password.");
             }
 
             // asing token and send response
-            return Ok(new
-            {
+            return Ok(
+                new  {
                 user = user,
                 token = createToken(user)
             });
@@ -68,23 +65,30 @@ namespace jwtAuth.Controllers
         // Create token method
        private string createToken(User user)
         {
-            // We create claim to store username and other information
-            var claims = new List<Claim>
+            // Create claims that will be stored inside the JWT (user identity data)
+             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Username)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(getAppSettings("Token")!));
+            // Create a security key from the secret used to sign the token
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(getAppSettings("Token")!)
+            );
 
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
+            // Define the signing credentials using HMAC SHA-512
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 
+            // Create the JWT with issuer, audience, claims, expiration, and signature
             var tokenDescriptor = new JwtSecurityToken(
                 issuer: getAppSettings("Issuer"),
                 audience: getAppSettings("Audience"),
                 claims: claims,
                 expires: DateTime.UtcNow.AddDays(1),
-                signingCredentials:creds
-                );
+                signingCredentials: credentials
+            );
+
+            // Generate and return the encoded JWT string
             return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
         }
 
