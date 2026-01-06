@@ -87,3 +87,25 @@ Git hub push ======================================>
         public UserDto User { get; set; }
         public string Token { get; set; }   
     }
+
+Git hub push ======================================>
+Sequre the API with JWT Bearer Authentication
+
+1. Install Package name Microsoft.AspNetCore.Authentication.JwtBearer
+2. register JWT Bearer Authentication inside program.cs as following:
+    builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("AppSettings:Token")!)),
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidIssuer = builder.Configuration.GetValue<string>("AppSettings.Issuer"),
+                ValidAudience = builder.Configuration.GetValue<string>("AppSettings:Audience"),
+            };
+        });
+
+3. add app.UseAuthentication(); before app.UseAuthorization(); inside program.cs
+4. add [Authorize] attribute above the controller or action method to protect it

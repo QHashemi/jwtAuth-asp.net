@@ -1,6 +1,7 @@
 ﻿using jwtAuth.Entities;
 using jwtAuth.Entities.Models;
 using jwtAuth.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 
@@ -42,6 +43,15 @@ namespace jwtAuth.Controllers
             }
             return Ok(serivceResponse);
 
+        }
+
+
+        // TEST Sequre END POINT =======================================================================>
+        [Authorize]
+        [HttpGet("test")]
+        public ActionResult<string> Test()
+        {
+            return Ok("The API is working!");
         }
     }
 }
