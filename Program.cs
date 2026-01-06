@@ -1,4 +1,5 @@
 using jwtAuth.Data;
+using jwtAuth.Services;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -14,10 +15,11 @@ builder.Services.AddOpenApi();
 // Sql Server connection
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectionString")));
 
+// Dependency Injection for AuthService
+builder.Services.AddScoped<IAuthService, AuthService>();
+
 // app
 var app = builder.Build();
-
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

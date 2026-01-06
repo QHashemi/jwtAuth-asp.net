@@ -75,3 +75,15 @@ Database configuration
 10. Run the update-database command to create the database tables based on your DbContext and entity configurations.
 
 Git hub push ======================================>
+1. Create new folder name services
+2. inside the services folder create file name AuthService.cs
+3. inside the services folder create file name IAuthService.cs
+4. Add logic for AuthService and IAuthService
+5. register AuthService inside program.cs as following:
+    builder.Services.AddScoped<IAuthService, AuthService>();
+6. Create ResponseDto from every service to handle response like following:
+   public class AuthLoginResponseDto
+    {
+        public UserDto User { get; set; }
+        public string Token { get; set; }   
+    }
