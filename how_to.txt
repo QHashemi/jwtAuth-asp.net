@@ -1,0 +1,48 @@
+1. Create Folder name Entities (Database Model)
+2. Inside the Entities folder create file name User.cs (Add Entity )
+3. Inside the Entities folder create Folder name Models
+4. Inside the Models create file name UserDto.cs
+	 UserDto.cs => UserDTO is a data carrier used to transfer data between layers
+
+5. Create Folder name Controllers 
+6. inside controllers folder create file name UserController.cs
+5. Add Logic of UserController
+
+7. To has password we use Built in function from c# like following:
+	var hashedPassowrd = new PasswordHasher<User>().HashPassword(user, request.Password);
+8. To Verify hashed Passowrd we use the same built in function like following:
+	var result = new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, request.Password) == PasswordVerificationResult.Failed;
+
+9. To run software we use package name scalar.AspNetCore(2.11.10)
+10 install scalar with nuget package manager
+11. add following code inside program.cs as following:
+
+	if (app.Environment.IsDevelopment())
+	{
+		app.MapScalarApiReference();
+	}
+
+12. To use JWT we install System.IdentityModel.Tokens.Jwt
+13. And use the JWT as follwing:
+    private string createToken(User user)
+        {
+            // We create claim to store username and other information
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Username)
+            };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetValue<string>("AppSettings:Token")!));
+
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
+
+            var tokenDescriptor = new JwtSecurityToken(
+                issuer: configuration.GetValue<string>("AppSettings.Issuer"),
+                audience: configuration.GetValue<string>("AppSettings:Audience"),
+                claims: claims,
+                expires: DateTime.UtcNow.AddDays(1),
+                signingCredentials:creds
+                );
+            return new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
+        }
+

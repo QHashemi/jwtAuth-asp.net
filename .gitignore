@@ -1,0 +1,64 @@
+# ==============================
+# ASP.NET Core
+# ==============================
+
+## Build results
+bin/
+obj/
+
+## Visual Studio
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Visual Studio Code
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+## Rider
+.idea/
+
+## OS files
+.DS_Store
+Thumbs.db
+
+## Logs
+*.log
+
+## User Secrets
+secrets.json
+
+## App settings overrides (DO NOT COMMIT SECRETS)
+appsettings.Development.json
+appsettings.Production.json
+
+## Certificates
+*.pfx
+*.cer
+
+## Publish output
+publish/
+wwwroot/
+
+## NuGet
+*.nupkg
+packages/
+.nuget/
+
+## EF Core
+Migrations/
+
+## Test results
+TestResults/
+
+## Dotnet tools
+.dotnet/
+
+## Temporary files
+*.tmp
+*.temp
