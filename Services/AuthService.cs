@@ -34,6 +34,7 @@ namespace jwtAuth.Services
             // set user data
             user.Username = request.Username;
             user.PasswordHash = hashedPassowrd;
+            user.Role = request.Role;
 
             // save data to database
             await context.Users.AddAsync(user);
@@ -71,7 +72,8 @@ namespace jwtAuth.Services
                 Token = token,
                 User = new UserDto
                 {
-                    Username = user.Username
+                    Username = user.Username,
+                    Role = user.Role,
                 }
             };
 
@@ -87,7 +89,8 @@ namespace jwtAuth.Services
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new Claim(ClaimTypes.Role, user.Role)
             };
 
             // Create a security key from the secret used to sign the token

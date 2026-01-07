@@ -3,7 +3,6 @@ using jwtAuth.Entities.Models;
 using jwtAuth.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 
 
 namespace jwtAuth.Controllers
@@ -52,6 +51,15 @@ namespace jwtAuth.Controllers
         public ActionResult<string> Test()
         {
             return Ok("The API is working!");
+        }
+
+
+        // ADMIN ONLY END POINT =======================================================================>
+        [Authorize(Roles = "admin")]
+        [HttpGet("admin")]
+        public ActionResult AdminOnlyEndpoint()
+        {
+            return Ok("You are an admin!");
         }
     }
 }

@@ -16,13 +16,14 @@ Login and Register + JWT + Password Hash
 	var result = new PasswordHasher<User>().VerifyHashedPassword(user, user.PasswordHash, request.Password) == PasswordVerificationResult.Failed;
 
 9. To run software we use package name scalar.AspNetCore(2.11.10)
-10 install scalar with nuget package manager
+10 install scalar with nuget package manager (Visit localhost at: https://localhost:7003/scalar/)
 11. add following code inside program.cs as following:
 
 	if (app.Environment.IsDevelopment())
 	{
 		app.MapScalarApiReference();
 	}
+
 
 12. To use JWT we install System.IdentityModel.Tokens.Jwt
 13. And use the JWT as follwing:
@@ -109,3 +110,24 @@ Sequre the API with JWT Bearer Authentication
 
 3. add app.UseAuthentication(); before app.UseAuthorization(); inside program.cs
 4. add [Authorize] attribute above the controller or action method to protect it
+
+Git hub push ======================================>
+
+Adding Roles to the User Model
+1. Update User Entity to include Role property
+   public string Role { get; set; }
+2. Update the dbContext and create new migration
+    add-migration AddUserRole
+3. Create new endpoint inside UserController for assigning roles
+    [Authorize(Roles = "Admin")]
+    [HttpGet("admin")]
+    public ActionResult AdminOnlyEndpoint()
+    {
+        return Ok("You are an admin!");
+    }
+4. Update Claims in createToken method to include Role claim
+    claims.Add(new Claim(ClaimTypes.Role, user.Role));
+5. Update the controller methods to use role-based authorization
+
+6. The Role in [Authorize(roles="admin")] must match the Role assigned to the user during registration or through role assignment.
+
