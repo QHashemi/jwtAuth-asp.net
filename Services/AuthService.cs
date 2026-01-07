@@ -1,13 +1,13 @@
 ﻿
 using jwtAuth.Data;
-using jwtAuth.Dtos;
 using jwtAuth.Entities;
-using jwtAuth.Entities.Models;
+using jwtAuth.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace jwtAuth.Services
@@ -15,7 +15,7 @@ namespace jwtAuth.Services
     public class AuthService(AppDbContext context, IConfiguration configuration) : IAuthService
     {
 
-        // Serveice for registering a new user
+        // Serveice for registering a new user ===========================================================>
         public async Task<User?> RegisterAsync(UserDto request)
         {
             // Check if user already exists
@@ -46,7 +46,7 @@ namespace jwtAuth.Services
 
 
 
-
+        // Service for logging in a user ============================================================>
         public async Task<AuthLoginResponseDto> LoginAsync(UserDto request)
         {
             // find user by username
@@ -64,12 +64,13 @@ namespace jwtAuth.Services
             }
 
             // create and return token
-            var token = createToken(user);
+            var token = createAccessToken(user);
 
             // return response dto
             return new AuthLoginResponseDto
             {
-                Token = token,
+                AccessToken = token,
+                RefreshToken = await GenerateAndSaveRefreshTokenAsync(user), // every time a user is login the refresh token is also generated
                 User = new UserDto
                 {
                     Username = user.Username,
@@ -81,9 +82,65 @@ namespace jwtAuth.Services
 
 
 
+        // Refresh token service ============================================================>
+        public async Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto request)
+        {
+            // validate the refresh token
+            var user = await ValidateRefreshTokenAsync(request.UserId, request.RefreshToken);
+            if (user is null)
+            {
+                return null;
+            }
+            // generate new refresh token and save to database
+            var newRefreshToken = await GenerateAndSaveRefreshTokenAsync(user);
+            // return new refresh token
+            return new TokenResponseDto
+            {
+                AccessToken = createAccessToken(user),
+                RefreshToken = newRefreshToken,
+            };
+        }
 
-        // Create token method
-        private string createToken(User user)
+
+        // Validate Refresh token ============================================================>
+        private async Task<User?> ValidateRefreshTokenAsync(Guid userId, string refreshToken)
+        {
+            var user = await context.Users.FindAsync(userId);
+            if (user is null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            {
+                return null;
+            }
+            return user;
+        }
+
+
+
+        // Generate refresh token =============================================================>
+        private string GenerateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
+            
+        }
+
+        // Store refresh token in database ============================================================>
+        private async Task<string> GenerateAndSaveRefreshTokenAsync(User user)
+        {
+            var refreshToken = GenerateRefreshToken();
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            await context.SaveChangesAsync();
+
+            return refreshToken;
+        }
+
+
+
+
+        // Create token method ============================================================>
+        private string createAccessToken(User user)
         {
             // Create claims that will be stored inside the JWT (user identity data)
             var claims = new List<Claim>
@@ -118,7 +175,7 @@ namespace jwtAuth.Services
         private string getAppSettings(string setting)
         {
             var appSettingsString = $"AppSettings:{setting}";
-            return configuration.GetValue<string>(appSettingsString);
+            return configuration.GetValue<string>(appSettingsString)!;
         }
     }
 }

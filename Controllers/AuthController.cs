@@ -1,5 +1,5 @@
 ﻿using jwtAuth.Entities;
-using jwtAuth.Entities.Models;
+using jwtAuth.Models;
 using jwtAuth.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -45,7 +45,21 @@ namespace jwtAuth.Controllers
         }
 
 
-        // TEST Sequre END POINT =======================================================================>
+        // Refresh Token =======================================================================>
+        [HttpPost("refresh-token")]
+        public async Task<ActionResult<RefreshTokenRequestDto>> RefreshToken(RefreshTokenRequestDto request)
+        {
+            var serviceResponse = await authService.RefreshTokenAsync(request);
+            if (serviceResponse == null || serviceResponse.AccessToken is null || serviceResponse.RefreshToken is null)
+            {
+                return Unauthorized("Invalid refresh token.");
+            }
+            return Ok(serviceResponse);
+        }
+
+
+
+        // ENDPOINT WITH ONLY JWT =======================================================================>
         [Authorize]
         [HttpGet("test")]
         public ActionResult<string> Test()
@@ -54,7 +68,7 @@ namespace jwtAuth.Controllers
         }
 
 
-        // ADMIN ONLY END POINT =======================================================================>
+        // ENDPOINT WITH JWT AND ROLE=======================================================================>
         [Authorize(Roles = "admin")]
         [HttpGet("admin")]
         public ActionResult AdminOnlyEndpoint()

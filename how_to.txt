@@ -4,7 +4,8 @@ Login and Register + JWT + Password Hash
 2. Inside the Entities folder create file name User.cs (Add Entity )
 3. Inside the Entities folder create Folder name Models
 4. Inside the Models create file name UserDto.cs
-	 UserDto.cs => UserDTO is a data carrier used to transfer data between layers
+	 a. UserDTO is the data that the client will send to the server
+     b. The Dto is the data that we send back to the client after processing the request
 
 5. Create Folder name Controllers 
 6. inside controllers folder create file name UserController.cs
@@ -131,3 +132,25 @@ Adding Roles to the User Model
 
 6. The Role in [Authorize(roles="admin")] must match the Role assigned to the user during registration or through role assignment.
 
+Git hub push ======================================>
+
+Implementing Refresh Tokens for JWT
+1. Update User Entity to include RefreshToken and RefreshTokenExpiryTime properties
+   public string RefreshToken { get; set; }
+   public DateTime RefreshTokenExpiryTime { get; set; }
+2. Add Migration for the new properties
+    add-migration AddRefreshTokenToUser
+3. Create endpoint for generating refresh tokens
+    [HttpPost("refresh-token")]
+    public ActionResult RefreshToken([FromBody] TokenRequestDto request)
+    {
+        // Validate the refresh token and generate a new JWT
+    }
+4. Create EndPoint to save Refresh Token in Database
+    [HttpPost("save-refresh-token")]
+    public ActionResult SaveRefreshToken([FromBody] SaveRefreshTokenDto request)
+    {
+        // Save the refresh token and its expiry time in the database
+    }
+
+5. Create new Service to validate the refresh token.

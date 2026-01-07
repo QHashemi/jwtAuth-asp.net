@@ -1,11 +1,14 @@
-﻿using jwtAuth.Dtos;
-using jwtAuth.Entities;
+﻿using jwtAuth.Entities;
+using jwtAuth.Models;
 
 namespace jwtAuth.Services
 {
     public interface IAuthService
     {
-       Task<User?> RegisterAsync(Entities.Models.UserDto request);
-       Task<AuthLoginResponseDto?> LoginAsync(Entities.Models.UserDto request);
+       Task<User?> RegisterAsync(UserDto request);
+
+       Task<AuthLoginResponseDto?> LoginAsync(UserDto request);
+
+       Task<TokenResponseDto?> RefreshTokenAsync(RefreshTokenRequestDto request);
     }
 }
